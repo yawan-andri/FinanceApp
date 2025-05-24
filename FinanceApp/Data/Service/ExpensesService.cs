@@ -10,26 +10,41 @@ namespace FinanceApp.Data.Service
 		{
 			_context = context;
 		}
+
+		public async Task<IEnumerable<Expense>> GetAll()
+		{
+			var expenses = await _context.Expenses.ToListAsync();
+			return expenses;
+		}
+
 		public async Task Add(Expense expense)
 		{
 			_context.Expenses.Add(expense);
 			await _context.SaveChangesAsync();
 		}
 
-		public Task Delete(Expense expense)
+		public async Task<Expense?> GetExpense(int id)
 		{
-			throw new NotImplementedException();
+			var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id);
+			return expense;
 		}
 
-		public Task Edit(Expense expense)
+		public async Task Edit(Expense expense)
 		{
-			throw new NotImplementedException();
+			var expenseEdit = await _context.Expenses.FindAsync(expense.Id);
+			if (expenseEdit != null)
+			{
+				expenseEdit.Description = expense.Description;
+				expenseEdit.Amount = expense.Amount;
+				expenseEdit.Category = expense.Category;
+
+				await _context.SaveChangesAsync();
+			}
 		}
 
-		public async Task<IEnumerable<Expense>> GetAll()
+		public async Task Delete(Expense expense)
 		{
-			var expenses = await _context.Expenses.ToListAsync();
-			return expenses;
+			throw new NotImplementedException();
 		}
 
 		public IQueryable GetChartData()

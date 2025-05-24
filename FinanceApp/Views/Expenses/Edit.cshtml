@@ -1,0 +1,43 @@
+﻿@model FinanceApp.Models.Expense
+
+@{
+	ViewData["Title"] = "Edit";
+}
+
+<div class="container">
+	<h2>Add Expense</h2>
+	<form asp-action="Edit"
+		  method="post">
+		<div>
+			<label asp-for="Description"
+				   class="form-label">
+				Descrtipion
+			</label>
+			<input asp-for="Description"
+				   class="form-control"
+				   type="text" />
+		</div>
+		<div>
+			<label asp-for="Amount"
+				   class="form-label">
+				Amount
+			</label>
+			<input asp-for="Amount"
+				   class="form-control"
+				   type="number" />
+		</div>
+		<div>
+			<label asp-for="Category"
+				   class="form-label">
+				Category
+			</label>
+			<input asp-for="Category"
+				   class="form-control"
+				   type="text" />
+		</div>
+		<div class="mt-3">
+			<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+			<a href="Index" class="btn btn-outline-info btn-sm">Back</a>
+		</div>
+	</form>
+</div>

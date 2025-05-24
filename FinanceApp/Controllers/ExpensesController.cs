@@ -30,7 +30,31 @@ namespace FinanceApp.Controllers
 			if (ModelState.IsValid)
 			{
 				await _expenseService.Add(expense);
+				return RedirectToAction("Index");
+			}
+			return View(expense);
+		}
+		public async Task<IActionResult> Edit(int id)
+		{
+			var expense = await _expenseService.GetExpense(id);
+			if (expense == null) 
+			{
+				return NotFound();
+			}
+			return View(expense);
+		}
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(int id, Expense expense)
+		{
+			if (id != expense.Id) 
+			{
+				return BadRequest();
+			}
 
+			if (ModelState.IsValid)
+			{
+				await _expenseService.Edit(expense);
 				return RedirectToAction("Index");
 			}
 			return View(expense);
