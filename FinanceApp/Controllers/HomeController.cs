@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Threading.Tasks;
+using FinanceApp.Data.Service;
 using FinanceApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,7 +15,7 @@ namespace FinanceApp.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }

@@ -24,7 +24,7 @@
 				<tr>
 					<td>@item.Description</td>
 					<td>@item.Amount.ToString("C", new System.Globalization.CultureInfo("id-ID"))</td>
-					<td>@item.Category</td>
+					<td>@item.Category?.Name</td>
 					<td>@item.Date.ToString("yyyy-MM-dd")</td>
 					<td>
 						<a asp-controller="Expenses"

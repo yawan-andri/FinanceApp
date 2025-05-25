@@ -2,6 +2,7 @@
 using FinanceApp.Data.Service;
 using FinanceApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -15,13 +16,21 @@ namespace FinanceApp.Controllers
 			_expenseService = expenseService;
 		}
 
+		private async Task PopulateCategories()
+		{
+			var categories = await _expenseService.GetAllCategories();
+			ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
+		}
+
 		public async Task<IActionResult> Index()	
 		{
 			var expenses = await _expenseService.GetAll();
 			return View(expenses);
 		}
-		public IActionResult Create()
+
+		public async Task<IActionResult> Create()
 		{
+			await PopulateCategories();
 			return View();
 		}
 
@@ -38,6 +47,8 @@ namespace FinanceApp.Controllers
 
 		public async Task<IActionResult> Edit(int id)
 		{
+			await PopulateCategories();
+
 			var expense = await _expenseService.GetExpense(id);
 			if (expense == null) 
 			{

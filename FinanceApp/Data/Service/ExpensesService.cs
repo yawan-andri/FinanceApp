@@ -1,4 +1,5 @@
 ﻿using FinanceApp.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinanceApp.Data.Service
@@ -13,8 +14,14 @@ namespace FinanceApp.Data.Service
 
 		public async Task<IEnumerable<Expense>> GetAll()
 		{
-			var expenses = await _context.Expenses.ToListAsync();
+			var expenses = await _context.Expenses
+				.Include(c => c.Category)
+				.ToListAsync();
 			return expenses;
+		}
+		public async Task<IEnumerable<ChoiceList>> GetAllCategories()
+		{
+			return await _context.ChoiceLists.ToListAsync();
 		}
 
 		public async Task Add(Expense expense)
@@ -25,7 +32,9 @@ namespace FinanceApp.Data.Service
 
 		public async Task<Expense?> GetExpense(int id)
 		{
-			var expense = await _context.Expenses.FirstOrDefaultAsync(e => e.Id == id);
+			var expense = await _context.Expenses
+				.Include(c => c.Category)
+				.FirstOrDefaultAsync(e => e.Id == id);
 			return expense;
 		}
 
@@ -36,7 +45,7 @@ namespace FinanceApp.Data.Service
 			{
 				expenseEdit.Description = expense.Description;
 				expenseEdit.Amount = expense.Amount;
-				expenseEdit.Category = expense.Category;
+				expenseEdit.CategoryId = expense.CategoryId;
 
 				await _context.SaveChangesAsync();
 			}
@@ -51,7 +60,8 @@ namespace FinanceApp.Data.Service
 		public IQueryable GetChartData()
 		{
 			var data = _context.Expenses
-				.GroupBy(e => e.Category)
+				.Include(c => c.Category)
+				.GroupBy(e => e.Category!.Name)
 				.Select(g => new
 				{
 					Category = g.Key,
