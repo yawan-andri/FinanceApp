@@ -38,6 +38,14 @@ namespace FinanceApp.Data.Service
 			return expense;
 		}
 
+		public async Task<bool> IsEditable(int id)
+		{
+			var expense = await _context.Expenses.FindAsync(id);
+			if (expense == null) return false;
+
+			return (DateTime.Now - expense.Date).TotalDays <= 3;
+		}
+
 		public async Task Edit(Expense expense)
 		{
 			var expenseEdit = await _context.Expenses.FindAsync(expense.Id);

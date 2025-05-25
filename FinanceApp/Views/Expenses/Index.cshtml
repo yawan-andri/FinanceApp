@@ -4,9 +4,26 @@
 }
 
 <div class="container">
-	<h2>My Expenses</h2>
+	<h2 class="text-center">My Expenses</h2>
 
-	<a asp-controller="Expenses" asp-action="Create" class="btn btn-outline-success btn-sm mt-3">Create New Expense</a>
+	@if (TempData["EditError"] != null)
+	{
+		<div class="alert alert-warning alert-dismissible fade show" 
+			role="alert">
+			@TempData["EditError"]
+			<button type="button" 
+				class="btn-close" 
+				data-bs-dismiss="alert" 
+				aria-label="Close">
+			</button>
+		</div>
+	}
+
+	<a asp-controller="Expenses" 
+		asp-action="Create" 
+		class="btn btn-outline-success btn-sm mt-3">
+		New Expense
+	</a>
 
 	<table class="table table-bordered mt-3">
 		<thead class="table-light">

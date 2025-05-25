@@ -8,6 +8,7 @@ namespace FinanceApp.Data.Service
 		Task<IEnumerable<ChoiceList>> GetAllCategories();
 		Task Add(Expense expense);
 		Task<Expense?> GetExpense(int id);
+		Task<bool> IsEditable(int id);
 		Task Edit(Expense expense);
 		Task Delete(Expense expense);
 		IQueryable GetChartData();

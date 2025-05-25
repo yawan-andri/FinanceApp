@@ -45,8 +45,23 @@ namespace FinanceApp.Controllers
 			return View(expense);
 		}
 
+		private async Task<bool> IsEditable(int id)
+		{
+			return await _expenseService.IsEditable(id);
+		}
+
+		private IActionResult GetEditFalse()
+		{
+			TempData["EditError"] = "Data can't be edited because it's has been more than 3 days.";
+			return RedirectToAction("Index");
+		}
 		public async Task<IActionResult> Edit(int id)
 		{
+			if (!await IsEditable(id)) 
+			{
+				return GetEditFalse();
+			}
+
 			await PopulateCategories();
 
 			var expense = await _expenseService.GetExpense(id);
@@ -76,6 +91,11 @@ namespace FinanceApp.Controllers
 
 		public async Task<IActionResult> Delete(int id)
 		{
+			if (!await IsEditable(id))
+			{
+				return GetEditFalse();
+			}
+
 			var expense = await _expenseService.GetExpense(id);
 			if (expense == null)
 			{
