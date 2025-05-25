@@ -123,22 +123,15 @@
 					url: url,
 					data: data,
 					success: function (result) {
-						// Tutup modal
 						$('#createExpenseModal').modal('hide');
-
-						// Clear form (opsional)
 						form.trigger('reset');
 
-						// Tampilkan alert sukses
 						$('#alertContainer').html(`
 							<div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
 								Expense berhasil ditambahkan.
 								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 							</div>
 						`);
-
-						// TODO: Refresh table atau fetch ulang data
-						// atau tambahkan row baru via JS (next step)
 					},
 					error: function (xhr) {
 						$('#alertContainer').html(`
@@ -157,7 +150,7 @@
 				method: 'GET',
 				success: function (categories) {
 					var select = $('#CategoryId');
-					select.empty(); // Kosongkan dulu
+					select.empty();
 
 					select.append($('<option>', {
 						value: '',
