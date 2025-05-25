@@ -34,6 +34,11 @@ namespace FinanceApp.Controllers
 			var expenses = await _expenseService.GetAll();
 			return View(expenses);
 		}
+		public async Task<IActionResult> TablePartial()
+		{
+			var data = await _expenseService.GetAll();
+			return PartialView("_ExpensesTablePartial", data);
+		}
 
 		public async Task<IActionResult> Create()
 		{
@@ -51,7 +56,8 @@ namespace FinanceApp.Controllers
 				return Json(new { success = true });
 			}
 			//return View(expense);
-			return BadRequest(ModelState);
+			//return BadRequest(ModelState);
+			return Json(new { success = false });
 		}
 
 		private async Task<bool> IsEditable(int id)
