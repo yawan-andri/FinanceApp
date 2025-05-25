@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<FinanceApp.Models.Expense>
+
 @{
 	ViewData["Title"] = "Expenses";
 }
@@ -19,11 +20,22 @@
 		</div>
 	}
 
+	<div id="alertContainer"></div>
+
 	<a asp-controller="Expenses" 
 		asp-action="Create" 
 		class="btn btn-outline-success btn-sm mt-3">
 		New Expense
 	</a>
+
+	<!-- Tombol untuk buka modal -->
+	<button type="button" 
+		class="btn btn-outline-success btn-sm mt-3" 
+		data-bs-toggle="modal" 
+		data-bs-target="#createExpenseModal">
+		Add New Expense
+	</button>
+
 
 	<table class="table table-bordered mt-3">
 		<thead class="table-light">
@@ -62,6 +74,108 @@
 		</tbody>
 	</table>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="createExpenseModal" tabindex="-1" aria-labelledby="createExpenseModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<form id="createExpenseForm" action="/Expenses/Create" method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="createExpenseModalLabel">Add Expense</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="mb-3">
+						<label for="Description" class="form-label">Description</label>
+						<input name="Description" id="Description" class="form-control" required />
+					</div>
+					<div class="mb-3">
+						<label for="Amount" class="form-label">Amount</label>
+						<input name="Amount" id="Amount" class="form-control" type="number" step="0.01" required />
+					</div>
+					<div class="mb-3">
+						<label for="CategoryId" class="form-label">Category</label>
+						<select id="CategoryId" name="CategoryId" class="form-control"></select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+					<button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('#createExpenseForm').submit(function (e) {
+				e.preventDefault();
+
+				var form = $(this);
+				var url = form.attr('action');
+				var data = form.serialize();
+
+				$.ajax({
+					type: 'POST',
+					url: url,
+					data: data,
+					success: function (result) {
+						// Tutup modal
+						$('#createExpenseModal').modal('hide');
+
+						// Clear form (opsional)
+						form.trigger('reset');
+
+						// Tampilkan alert sukses
+						$('#alertContainer').html(`
+							<div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+								Expense berhasil ditambahkan.
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						`);
+
+						// TODO: Refresh table atau fetch ulang data
+						// atau tambahkan row baru via JS (next step)
+					},
+					error: function (xhr) {
+						$('#alertContainer').html(`
+							<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+								Gagal menambahkan Expense. Pastikan data valid.
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
+						`);
+					}
+				});
+			});
+		});
+		$('#createExpenseModal').on('show.bs.modal', function () {
+			$.ajax({
+				url: '/Expenses/GetCategories',
+				method: 'GET',
+				success: function (categories) {
+					var select = $('#CategoryId');
+					select.empty(); // Kosongkan dulu
+
+					select.append($('<option>', {
+						value: '',
+						text: '-- Pilih Kategori --'
+					}));
+
+					$.each(categories, function (i, category) {
+						select.append($('<option>', {
+							value: category.id,
+							text: category.name
+						}));
+					});
+				}
+			});
+		});
+	</script>
+}
+
 
 <div class="container">
 	<h2>Expenses Overview</h2>

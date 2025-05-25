@@ -22,6 +22,13 @@ namespace FinanceApp.Controllers
 			ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
 		}
 
+		[HttpGet]
+		public async Task<IActionResult> GetCategories()
+		{
+			var categories = await _expenseService.GetAllCategories();
+			return Json(categories);
+		}
+
 		public async Task<IActionResult> Index()	
 		{
 			var expenses = await _expenseService.GetAll();
@@ -40,9 +47,11 @@ namespace FinanceApp.Controllers
 			if (ModelState.IsValid)
 			{
 				await _expenseService.Add(expense);
-				return RedirectToAction("Index");
+				//return RedirectToAction("Index");
+				return Json(new { success = true });
 			}
-			return View(expense);
+			//return View(expense);
+			return BadRequest(ModelState);
 		}
 
 		private async Task<bool> IsEditable(int id)
