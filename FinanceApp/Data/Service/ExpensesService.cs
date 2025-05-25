@@ -44,7 +44,8 @@ namespace FinanceApp.Data.Service
 
 		public async Task Delete(Expense expense)
 		{
-			throw new NotImplementedException();
+			_context.Expenses.Remove(expense);
+			await _context.SaveChangesAsync();
 		}
 
 		public IQueryable GetChartData()

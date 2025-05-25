@@ -24,6 +24,7 @@ namespace FinanceApp.Controllers
 		{
 			return View();
 		}
+
 		[HttpPost]
 		public async Task<IActionResult> Create(Expense expense)
 		{
@@ -34,6 +35,7 @@ namespace FinanceApp.Controllers
 			}
 			return View(expense);
 		}
+
 		public async Task<IActionResult> Edit(int id)
 		{
 			var expense = await _expenseService.GetExpense(id);
@@ -43,6 +45,7 @@ namespace FinanceApp.Controllers
 			}
 			return View(expense);
 		}
+
 		[HttpPost]
 		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Edit(int id, Expense expense)
@@ -59,6 +62,31 @@ namespace FinanceApp.Controllers
 			}
 			return View(expense);
 		}
+
+		public async Task<IActionResult> Delete(int id)
+		{
+			var expense = await _expenseService.GetExpense(id);
+			if (expense == null)
+			{
+				return NotFound();
+			}
+			return View(expense);
+		}
+
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteExpense(int id)
+		{
+			var expense = await _expenseService.GetExpense(id);
+			if (expense == null)
+			{
+				return NotFound();
+			}
+
+			await _expenseService.Delete(expense);
+			return RedirectToAction("Index");
+		}
+
 		public IActionResult GetChart()
 		{
 			var data = _expenseService.GetChartData();
