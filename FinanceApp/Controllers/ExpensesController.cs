@@ -70,6 +70,25 @@ namespace FinanceApp.Controllers
 			TempData["EditError"] = "Data can't be edited because it's has been more than 3 days.";
 			return RedirectToAction("Index");
 		}
+
+		[HttpGet]
+		public async Task<IActionResult> GetExpenseJson(int id)
+		{
+			var expense = await _expenseService.GetExpense(id);
+			if (expense == null) return NotFound();
+
+			var categories = await _expenseService.GetAllCategories();
+
+			return Json(new
+			{
+				id = expense.Id,
+				description = expense.Description,
+				amount = expense.Amount,
+				categoryId = expense.CategoryId,
+				categories = categories.Select(c => new { value = c.Id, text = c.Name })
+			});
+		}
+
 		public async Task<IActionResult> Edit(int id)
 		{
 			if (!await IsEditable(id)) 
@@ -87,21 +106,32 @@ namespace FinanceApp.Controllers
 			return View(expense);
 		}
 
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Edit(int id, Expense expense)
-		{
-			if (id != expense.Id) 
-			{
-				return BadRequest();
-			}
+		//[HttpPost]
+		//[ValidateAntiForgeryToken]
+		//public async Task<IActionResult> Edit(int id, Expense expense)
+		//{
+		//	if (id != expense.Id) 
+		//	{
+		//		return BadRequest();
+		//	}
 
+		//	if (ModelState.IsValid)
+		//	{
+		//		await _expenseService.Edit(expense);
+		//		return RedirectToAction("Index");
+		//	}
+		//	return View(expense);
+		//}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit(Expense expense)
+		{
 			if (ModelState.IsValid)
 			{
 				await _expenseService.Edit(expense);
-				return RedirectToAction("Index");
+				return Json(new { success = true });
 			}
-			return View(expense);
+			return Json(new { success = false });
 		}
 
 		public async Task<IActionResult> Delete(int id)
@@ -119,18 +149,21 @@ namespace FinanceApp.Controllers
 			return View(expense);
 		}
 
-		[HttpPost, ActionName("Delete")]
-		[ValidateAntiForgeryToken]
+		//[HttpPost, ActionName("Delete")]
+		//[ValidateAntiForgeryToken]
+		[HttpPost]
 		public async Task<IActionResult> DeleteExpense(int id)
 		{
 			var expense = await _expenseService.GetExpense(id);
 			if (expense == null)
 			{
-				return NotFound();
+				//return NotFound();
+				return Json(new { success = false });
 			}
 
 			await _expenseService.Delete(expense);
-			return RedirectToAction("Index");
+			//return RedirectToAction("Index");
+			return Json(new { success = true });
 		}
 
 		public IActionResult GetChart()

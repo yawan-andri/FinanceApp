@@ -152,9 +152,114 @@
 	</div>
 </div>
 
+<!-- Modal Edit -->
+<div class="modal fade" 
+	id="editExpenseModal" 
+	tabindex="-1" 
+	aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form id="editForm">
+				<div class="modal-header">
+					<h5 class="modal-title">
+						Edit Expense
+					</h5>
+					<button type="button" 
+						class="btn-close" 
+						data-bs-dismiss="modal" 
+						aria-label="Close">
+					</button>
+				</div>
+				<div class="modal-body">
+					<input type="hidden" 
+						id="editId" 
+						name="Id" />
+					<div class="mb-3">
+						<label class="form-label">
+							Description
+						</label>
+						<input type="text" 
+							class="form-control" 
+							id="editDescription" 
+							name="Description" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">
+							Amount
+						</label>
+						<input type="number" 
+							class="form-control" 
+							id="editAmount" 
+							name="Amount" />
+					</div>
+					<div class="mb-3">
+						<label class="form-label">
+							Category
+						</label>
+						<select class="form-control" 
+							id="editCategoryId" 
+							name="CategoryId">
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" 
+						class="btn btn-primary">
+						Update
+					</button>
+					<button type="button"
+							class="btn btn-secondary"
+							data-bs-dismiss="modal">
+						Cancel
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Delete -->
+<div class="modal fade" 
+	id="deleteExpenseModal" 
+	tabindex="-1" 
+	aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">
+					Confirm Delete
+				</h5>
+				<button type="button" 
+					class="btn-close"
+					data-bs-dismiss="modal" aria-label="Close">
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete this expense?</p>
+				<p><strong id="deleteDescription"></strong></p>
+			</div>
+			<div class="modal-footer">
+				<input type="hidden" id="deleteId" />
+				<button type="button"
+						class="btn btn-danger"
+						onclick="confirmDelete()">
+					Delete
+				</button>
+				<button type="button" 
+					class="btn btn-secondary" data-bs-dismiss="modal">
+					Cancel
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
 @section Scripts {
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script>
+		//Add Menu
 		$(document).ready(function () {
 			$('#createExpenseForm').submit(function (e) {
 				e.preventDefault();
@@ -212,10 +317,67 @@
 				}
 			});
 		});
+		//Edit Menu
+		function openEditModal(id) {
+			$.get(`/Expenses/GetExpenseJson/${id}`, function (data) {
+				$('#editId').val(data.id);
+				$('#editDescription').val(data.description);
+				$('#editAmount').val(data.amount);
+				$('#editCategoryId').empty();
+
+				$.each(data.categories, function (i, category) {
+					$('#editCategoryId').append(`<option value="${category.value}" ${category.value == data.categoryId ? "selected" : ""}>${category.text}</option>`);
+				});
+
+				$('#editExpenseModal').modal('show');
+			});
+		}
+		$('#editForm').submit(function (e) {
+			e.preventDefault();
+
+			$.ajax({
+				type: 'POST',
+				url: '/Expenses/Edit',
+				data: $(this).serialize(),
+				success: function (result) {
+					if (result.success) {
+						$('#expensesTable').load('/Expenses/TablePartial');
+						$('#editExpenseModal').modal('hide');
+					} else {
+						alert("Gagal memperbarui data.");
+					}
+				}
+			});
+		});
+		//Delete Menu
+		function openDeleteModal(id, description) {
+			$('#deleteId').val(id);
+			$('#deleteDescription').text(description);
+			$('#deleteExpenseModal').modal('show');
+		}
+		function confirmDelete() {
+			var id = $('#deleteId').val();
+
+			$.ajax({
+				url: '/Expenses/DeleteExpense/' + id,
+				type: 'POST',
+				success: function (result) {
+					if (result.success) {
+						$('#deleteExpenseModal').modal('hide');
+						$('#expensesTable').load('/Expenses/TablePartial');
+					} else {
+						alert("Gagal menghapus data.");
+					}
+				},
+				error: function () {
+					alert("Terjadi kesalahan.");
+				}
+			});
+		}
 	</script>
 }
 
-
+@* 
 <div class="container">
 	<h2>Expenses Overview</h2>
 </div>
@@ -242,4 +404,4 @@
 				},
 			});
 		})
-</script>
+</script> *@
